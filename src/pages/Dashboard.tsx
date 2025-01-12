@@ -23,6 +23,19 @@ export function Dashboard() {
     return <div className="p-6">Loading...</div>;
   }
 
+  const weeklyActivityData = chartData?.weeklyActivity && {
+    labels: chartData.weeklyActivity.labels,
+    withdraw: chartData.weeklyActivity.datasets[0].data,
+    deposit: chartData.weeklyActivity.datasets[1].data,
+  };
+
+  const expenseStatisticsData = chartData?.expenseStatistics;
+
+  const balanceHistoryData = chartData?.balanceHistory && {
+    labels: chartData.balanceHistory.labels,
+    data: chartData.balanceHistory.data,
+  };
+
   return (
     <>
       {/* Desktop Layout */}
@@ -43,9 +56,8 @@ export function Dashboard() {
 
             <div className="flex gap-6">
               {cards?.slice(0, 2).map((card) => (
-                <div className="w-1/2">
+                <div key={card.id} className="w-1/2">
                   <CreditCard
-                    key={card.id}
                     variant={card.variant}
                     balance={card.balance.toString()}
                     cardHolder={card.holder}
@@ -65,10 +77,10 @@ export function Dashboard() {
         {/* Second Row: Weekly Activity (2/3) & Expense Statistics (1/3) */}
         <div className="flex gap-6">
           <div className="w-2/3">
-            <WeeklyActivity data={chartData?.weeklyActivity} />
+            <WeeklyActivity data={weeklyActivityData} />
           </div>
           <div className="w-1/3">
-            <ExpenseStatistics data={chartData?.expenseStatistics} />
+            <ExpenseStatistics data={expenseStatisticsData} />
           </div>
         </div>
 
@@ -78,7 +90,7 @@ export function Dashboard() {
             <QuickTransfer />
           </div>
           <div className="w-3/5">
-            <BalanceHistory data={chartData?.balanceHistory} />
+            <BalanceHistory data={balanceHistoryData} />
           </div>
         </div>
       </div>
@@ -109,10 +121,10 @@ export function Dashboard() {
         </div>
 
         <RecentTransactions transactions={transactions || []} />
-        <WeeklyActivity data={chartData?.weeklyActivity} />
-        <ExpenseStatistics data={chartData?.expenseStatistics} />
+        <WeeklyActivity data={weeklyActivityData} />
+        <ExpenseStatistics data={expenseStatisticsData} />
         <QuickTransfer />
-        <BalanceHistory data={chartData?.balanceHistory} />
+        <BalanceHistory data={balanceHistoryData} />
       </div>
     </>
   );

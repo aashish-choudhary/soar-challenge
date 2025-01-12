@@ -8,6 +8,8 @@ import {
   LinearScale,
   Title,
   Tooltip,
+  ChartData,
+  ChartOptions,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
@@ -20,16 +22,31 @@ ChartJS.register(
   Legend
 );
 
-interface WeeklyActivityProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface WeeklyActivityProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: {
+    withdraw: number[];
+    deposit: number[];
+    labels: string[];
+  };
+}
 
-const options = {
+type ChartDataType = ChartData<"bar", number[], string>;
+type ChartOptionsType = ChartOptions<"bar">;
+
+const defaultData = {
+  labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
+  withdraw: [450, 340, 320, 380, 150, 350, 380],
+  deposit: [220, 120, 250, 350, 230, 230, 330],
+};
+
+const options: ChartOptionsType = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
       display: true,
-      position: "top" as const,
-      align: "end" as const,
+      position: "top",
+      align: "end",
       labels: {
         boxWidth: 8,
         boxHeight: 8,
@@ -46,11 +63,12 @@ const options = {
       display: false,
     },
     tooltip: {
+      enabled: true,
       backgroundColor: "#1A1D1F",
       padding: 12,
       titleFont: {
         size: 14,
-        weight: "500",
+        weight: 500,
       },
       bodyFont: {
         size: 14,
@@ -90,7 +108,9 @@ const options = {
         },
         padding: 12,
         stepSize: 100,
-        callback: (value: number) => value,
+        callback: function (value) {
+          return `$${value}`;
+        },
       },
       min: 0,
       max: 500,
@@ -98,38 +118,42 @@ const options = {
   },
 };
 
-const data = {
-  labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
-  datasets: [
-    {
-      label: "Withdraw",
-      data: [450, 340, 320, 380, 150, 350, 380],
-      backgroundColor: "#1A1D1F",
-      borderRadius: 100,
-      borderSkipped: false,
-      barPercentage: 0.5,
-      categoryPercentage: 0.7,
-    },
-    {
-      label: "Deposit",
-      data: [220, 120, 250, 350, 230, 230, 330],
-      backgroundColor: "#2563EB",
-      borderRadius: 100,
-      borderSkipped: false,
-      barPercentage: 0.5,
-      categoryPercentage: 0.7,
-    },
-  ],
-};
+export function WeeklyActivity({
+  data = defaultData,
+  className,
+  ...props
+}: WeeklyActivityProps) {
+  const chartData: ChartDataType = {
+    labels: data.labels,
+    datasets: [
+      {
+        label: "Withdraw",
+        data: data.withdraw,
+        backgroundColor: "#1A1D1F",
+        borderRadius: 100,
+        borderSkipped: false,
+        barPercentage: 0.5,
+        categoryPercentage: 0.7,
+      },
+      {
+        label: "Deposit",
+        data: data.deposit,
+        backgroundColor: "#2563EB",
+        borderRadius: 100,
+        borderSkipped: false,
+        barPercentage: 0.5,
+        categoryPercentage: 0.7,
+      },
+    ],
+  };
 
-export function WeeklyActivity({ className, ...props }: WeeklyActivityProps) {
   return (
     <div className={cn("", className)} {...props}>
       <h2 className="text-xl font-semibold text-[#1A1D1F]">Weekly Activity</h2>
 
       <Card className="mt-4 h-[320px] md:mt-6">
         <div className="h-full w-full">
-          <Bar options={options} data={data} />
+          <Bar options={options} data={chartData} />
         </div>
       </Card>
     </div>
