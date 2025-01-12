@@ -1,10 +1,19 @@
-import { Header } from "@/components/layout/Header";
-import { Sidenav } from "@/components/layout/Sidenav";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { Menu, Search } from "lucide-react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Menu, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Sidenav } from "@/components/layout/Sidenav";
+import { Header } from "@/components/layout/Header";
+import { Dashboard } from "@/pages/Dashboard";
+import { Transactions } from "@/pages/Transactions";
+import { Accounts } from "@/pages/Accounts";
+import { Investments } from "@/pages/Investments";
+import { CreditCards } from "@/pages/CreditCards";
+import { Loans } from "@/pages/Loans";
+import { Services } from "@/pages/Services";
+import { Privileges } from "@/pages/Privileges";
+import { Settings } from "@/pages/Settings";
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -88,6 +97,25 @@ export default function App() {
             />
           </div>
         </div>
+
+        <main
+          id="main-content"
+          className="relative overflow-auto md:col-start-2 md:row-start-2"
+        >
+          <div className="min-h-full pt-[116px] md:pt-0">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/investments" element={<Investments />} />
+              <Route path="/credit-cards" element={<CreditCards />} />
+              <Route path="/loans" element={<Loans />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/privileges" element={<Privileges />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </div>
+        </main>
       </div>
     </Router>
   );
