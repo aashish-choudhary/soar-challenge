@@ -10,6 +10,9 @@ import {
   Tooltip,
   Filler,
   Legend,
+  ChartOptions,
+  ChartData,
+  ScriptableContext,
 } from "chart.js";
 import { Card } from "@/components/ui/card";
 
@@ -24,9 +27,22 @@ ChartJS.register(
   Legend
 );
 
-interface BalanceHistoryProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface BalanceHistoryProps extends React.HTMLAttributes<HTMLDivElement> {
+  data?: {
+    labels: string[];
+    data: number[];
+  };
+}
 
-const options = {
+type ChartDataType = ChartData<"line", number[], string>;
+type ChartOptionsType = ChartOptions<"line">;
+
+const defaultData = {
+  labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"],
+  data: [300, 250, 450, 500, 750, 250, 600],
+};
+
+const options: ChartOptionsType = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -46,7 +62,7 @@ const options = {
       cornerRadius: 8,
       displayColors: false,
       callbacks: {
-        label: function (context: any) {
+        label: function (context) {
           return `$${context.parsed.y}`;
         },
       },
@@ -54,13 +70,12 @@ const options = {
   },
   interaction: {
     intersect: false,
-    mode: "index",
+    mode: "index" as const,
   },
   scales: {
     x: {
       grid: {
         display: false,
-        drawBorder: false,
       },
       border: {
         display: false,
@@ -79,7 +94,6 @@ const options = {
       },
       grid: {
         color: "#F1F5F9",
-        drawBorder: false,
         lineWidth: 1,
       },
       ticks: {
@@ -89,7 +103,9 @@ const options = {
         },
         padding: 12,
         stepSize: 200,
-        callback: (value: number) => value,
+        callback: function (value) {
+          return `$${value}`;
+        },
       },
       min: 0,
       max: 800,
@@ -98,39 +114,43 @@ const options = {
   },
 };
 
-const data = {
-  labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"],
-  datasets: [
-    {
-      fill: true,
-      data: [300, 250, 450, 500, 750, 250, 600],
-      borderColor: "#2563EB",
-      backgroundColor: (context: any) => {
-        const ctx = context.chart.ctx;
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, "rgba(37, 99, 235, 0.15)");
-        gradient.addColorStop(1, "rgba(37, 99, 235, 0)");
-        return gradient;
+export function BalanceHistory({
+  data = defaultData,
+  className,
+  ...props
+}: BalanceHistoryProps) {
+  const chartData: ChartDataType = {
+    labels: data.labels,
+    datasets: [
+      {
+        fill: true,
+        data: data.data,
+        borderColor: "#2563EB",
+        backgroundColor: (context: ScriptableContext<"line">) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, "rgba(37, 99, 235, 0.15)");
+          gradient.addColorStop(1, "rgba(37, 99, 235, 0)");
+          return gradient;
+        },
+        tension: 0.4,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: "#2563EB",
+        pointHoverBorderColor: "#fff",
+        pointHoverBorderWidth: 2,
       },
-      tension: 0.4,
-      borderWidth: 2,
-      pointRadius: 0,
-      pointHoverRadius: 6,
-      pointHoverBackgroundColor: "#2563EB",
-      pointHoverBorderColor: "#fff",
-      pointHoverBorderWidth: 2,
-    },
-  ],
-};
+    ],
+  };
 
-export function BalanceHistory({ className, ...props }: BalanceHistoryProps) {
   return (
     <div className={cn("", className)} {...props}>
       <h2 className="text-xl font-semibold text-[#1A1D1F]">Balance History</h2>
 
       <Card className="mt-4 h-[276px] md:mt-6">
         <div className="h-full w-full">
-          <Line options={options} data={data} />
+          <Line options={options} data={chartData} />
         </div>
       </Card>
     </div>
